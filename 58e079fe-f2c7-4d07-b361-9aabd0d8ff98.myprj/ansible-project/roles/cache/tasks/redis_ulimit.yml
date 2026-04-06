@@ -1,0 +1,27 @@
+---
+- name: Set Redis user ulimit for nofile
+  community.general.pam_limits:
+    domain: redis
+    limit_type: soft
+    limit_item: nofile
+    value: "65536"
+- name: Set Redis user ulimit for nofile (hard)
+  community.general.pam_limits:
+    domain: redis
+    limit_type: hard
+    limit_item: nofile
+    value: "65536"
+- name: Create limits.d directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/security/limits.d
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+- name: Create Redis limits file
+  ansible.builtin.template:
+    src: redis-limits.conf.j2
+    dest: /etc/security/limits.d/redis.conf
+    owner: root
+    group: root
+    mode: "0644"
