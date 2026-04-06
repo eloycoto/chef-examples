@@ -1,0 +1,3 @@
+---
+- include_vars: memcached.yml
+- include_vars: redis.yml

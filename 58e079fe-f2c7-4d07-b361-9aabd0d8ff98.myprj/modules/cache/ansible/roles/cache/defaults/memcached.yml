@@ -1,0 +1,10 @@
+---
+memcached_user: memcache
+memcached_port: 11211
+memcached_listen_address: 127.0.0.1
+memcached_max_connections: 1024
+memcached_memory: 64
+memcached_enable_sasl: false
+memcached_conf_file: "{{ ansible_os_family == 'Debian' | ternary('/etc/memcached.conf', '/etc/sysconfig/memcached') }}"
+memcached_log_file: /var/log/memcached.log
+memcached_extra_options: ""
