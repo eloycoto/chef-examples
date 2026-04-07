@@ -1,0 +1,8 @@
+description "Redis Server {{ redis_servers[0].port }}"
+
+start on runlevel [23]
+stop on shutdown
+
+exec sudo -u {{ redis_user }} /usr/bin/redis-server /etc/redis/{{ redis_servers[0].port }}.conf
+
+respawn

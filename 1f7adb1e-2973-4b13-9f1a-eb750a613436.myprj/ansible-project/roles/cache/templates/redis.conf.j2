@@ -1,0 +1,71 @@
+# Redis configuration file
+
+# Port to listen on
+port {{ redis_servers[0].port }}
+
+# IP address to listen on
+{% if redis_servers[0].bind %}
+bind {{ redis_servers[0].bind }}
+{% endif %}
+
+# Unix socket path and permissions
+{% if redis_servers[0].unixsocket %}
+unixsocket {{ redis_servers[0].unixsocket }}
+unixsocketperm {{ redis_servers[0].unixsocketperm }}
+{% endif %}
+
+# Close connection after client is idle for N seconds
+timeout {{ redis_servers[0].timeout }}
+
+# Log level
+loglevel {{ redis_servers[0].loglevel }}
+
+# Log file
+logfile {{ redis_servers[0].logfile }}
+
+# Database count
+databases {{ redis_servers[0].databases }}
+
+# Save to disk
+{% for save_rule in redis_servers[0].save %}
+save {{ save_rule }}
+{% endfor %}
+
+# Compress string objects using LZF when dump .rdb databases
+rdbcompression {{ redis_servers[0].rdbcompression }}
+
+# RDB filename
+dbfilename {{ redis_servers[0].dbfilename }}
+
+# Working directory
+dir {{ redis_servers[0].dir }}
+
+# Master-Slave replication
+{% if redis_servers[0].slaveof %}
+slaveof {{ redis_servers[0].slaveof }}
+{% endif %}
+
+{% if redis_servers[0].masterauth %}
+masterauth {{ redis_servers[0].masterauth }}
+{% endif %}
+
+# Maximum number of clients
+maxclients {{ redis_servers[0].maxclients }}
+
+# Maximum memory
+{% if redis_servers[0].maxmemory != "0" %}
+maxmemory {{ redis_servers[0].maxmemory }}
+maxmemory-policy {{ redis_servers[0].maxmemory_policy }}
+{% endif %}
+
+# Append Only Mode
+appendonly {{ redis_servers[0].appendonly }}
+appendfsync {{ redis_servers[0].appendfsync }}
+no-appendfsync-on-rewrite {{ redis_servers[0].no_appendfsync_on_rewrite }}
+auto-aof-rewrite-percentage {{ redis_servers[0].auto_aof_rewrite_percentage }}
+auto-aof-rewrite-min-size {{ redis_servers[0].auto_aof_rewrite_min_size }}
+
+# Password authentication
+{% if redis_servers[0].requirepass %}
+requirepass {{ redis_servers[0].requirepass }}
+{% endif %}
