@@ -1,0 +1,12 @@
+---
+redis_port: 6379
+redis_requirepass: redis_secure_password_123
+redis_bind: 0.0.0.0
+redis_maxmemory: 64mb
+redis_maxmemory_policy: allkeys-lru
+memcached_memory: 64
+memcached_port: 11211
+memcached_user: memcache
+memcached_listen: 0.0.0.0
+memcached_maxconn: 1024
+memcached_item_size: 1m
