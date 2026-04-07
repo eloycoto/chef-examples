@@ -1,0 +1,36 @@
+---
+memcached_port: 11211
+memcached_user: memcache
+memcached_max_connections: 1024
+memcached_memory: 64
+memcached_listen_address: 127.0.0.1
+memcached_extra_options: ""
+redis_user: redis
+redis_group: redis
+redis_servers:
+  - port: 6379
+    bind: 127.0.0.1
+    unixsocket: ""
+    unixsocketperm: 755
+    timeout: 0
+    loglevel: notice
+    logfile: /var/log/redis/redis.log
+    databases: 16
+    save:
+      - 900 1
+      - 300 10
+      - 60 10000
+    rdbcompression: "yes"
+    dbfilename: dump.rdb
+    dir: /var/lib/redis
+    slaveof: ""
+    masterauth: ""
+    maxclients: 10000
+    maxmemory: "0"
+    maxmemory_policy: volatile-lru
+    appendonly: "no"
+    appendfsync: everysec
+    no_appendfsync_on_rewrite: "no"
+    auto_aof_rewrite_percentage: 100
+    auto_aof_rewrite_min_size: 64mb
+    requirepass: ""
