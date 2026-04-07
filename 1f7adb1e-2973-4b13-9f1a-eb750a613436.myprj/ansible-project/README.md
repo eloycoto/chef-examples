@@ -97,6 +97,34 @@ ansible-playbook playbooks/run_fastapi_tutorial.yml -i inventory/hosts.yml
 
 
 
+### nginx_multisite
+
+
+Configures a secure Nginx web server with multiple virtual hosts, each with SSL enabled
+
+
+**Target platforms:** Ubuntu
+
+
+Run this role:
+
+```bash
+ansible-playbook playbooks/run_nginx_multisite.yml -i inventory/hosts.yml
+```
+
+
+**Default variables** (override in inventory or extra vars):
+
+| Variable | Default |
+|----------|---------|
+
+| `nginx` | `{'sites': {'test.cluster.local': {'document_root': '/opt/server/test', 'ssl_enabled': True}, 'ci.cluster.local': {'document_root': '/opt/server/ci', 'ssl_enabled': True}, 'status.cluster.local': {'document_root': '/opt/server/status', 'ssl_enabled': True}}, 'ssl': {'certificate_path': '/etc/ssl/certs', 'private_key_path': '/etc/ssl/private'}}` |
+
+| `security` | `{'fail2ban': {'enabled': True}, 'ufw': {'enabled': True}, 'ssh': {'disable_root': True, 'password_auth': False}}` |
+
+
+
+
 ## Prerequisites
 
 ### Collections
