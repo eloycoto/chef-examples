@@ -1,0 +1,123 @@
+---
+- name: Install security packages
+  ansible.builtin.package:
+    name:
+      - fail2ban
+      - ufw
+    state: present
+- name: Enable and start fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
+- name: Configure fail2ban jail
+  ansible.builtin.template:
+    src: fail2ban.jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    mode: "0644"
+  notify: Restart fail2ban
+- name: Set UFW default deny policy
+  ansible.builtin.command:
+    cmd: ufw --force default deny
+  changed_when: false
+  register: ufw_default_deny
+  failed_when: ufw_default_deny.rc != 0
+  when: ufw_default_deny_check.rc != 0
+- name: Check if UFW default deny is set
+  ansible.builtin.command:
+    cmd: ufw status
+  register: ufw_status_deny
+  changed_when: false
+  failed_when: false
+  check_mode: false
+- name: Register UFW default deny status
+  ansible.builtin.set_fact:
+    ufw_default_deny_check: "{{ {'rc': 0} if 'Default: deny' in ufw_status_deny.stdout else {'rc': 1} }}"
+- name: Allow SSH in UFW
+  ansible.builtin.command:
+    cmd: ufw allow ssh
+  changed_when: false
+  register: ufw_allow_ssh
+  failed_when: ufw_allow_ssh.rc != 0
+  when: ufw_allow_ssh_check.rc != 0
+- name: Check if SSH is allowed in UFW
+  ansible.builtin.command:
+    cmd: ufw status
+  register: ufw_status_ssh
+  changed_when: false
+  failed_when: false
+  check_mode: false
+- name: Register SSH UFW status
+  ansible.builtin.set_fact:
+    ufw_allow_ssh_check: "{{ {'rc': 0} if '22/tcp' in ufw_status_ssh.stdout else {'rc': 1} }}"
+- name: Allow HTTP in UFW
+  ansible.builtin.command:
+    cmd: ufw allow http
+  changed_when: false
+  register: ufw_allow_http
+  failed_when: ufw_allow_http.rc != 0
+  when: ufw_allow_http_check.rc != 0
+- name: Check if HTTP is allowed in UFW
+  ansible.builtin.command:
+    cmd: ufw status
+  register: ufw_status_http
+  changed_when: false
+  failed_when: false
+  check_mode: false
+- name: Register HTTP UFW status
+  ansible.builtin.set_fact:
+    ufw_allow_http_check: "{{ {'rc': 0} if '80/tcp' in ufw_status_http.stdout else {'rc': 1} }}"
+- name: Allow HTTPS in UFW
+  ansible.builtin.command:
+    cmd: ufw allow https
+  changed_when: false
+  register: ufw_allow_https
+  failed_when: ufw_allow_https.rc != 0
+  when: ufw_allow_https_check.rc != 0
+- name: Check if HTTPS is allowed in UFW
+  ansible.builtin.command:
+    cmd: ufw status
+  register: ufw_status_https
+  changed_when: false
+  failed_when: false
+  check_mode: false
+- name: Register HTTPS UFW status
+  ansible.builtin.set_fact:
+    ufw_allow_https_check: "{{ {'rc': 0} if '443/tcp' in ufw_status_https.stdout else {'rc': 1} }}"
+- name: Enable UFW
+  ansible.builtin.command:
+    cmd: ufw --force enable
+  changed_when: false
+  register: ufw_enable
+  failed_when: ufw_enable.rc != 0
+  when: ufw_enable_check.rc != 0
+- name: Check if UFW is enabled
+  ansible.builtin.command:
+    cmd: ufw status
+  register: ufw_status_enabled
+  changed_when: false
+  failed_when: false
+  check_mode: false
+- name: Register UFW enabled status
+  ansible.builtin.set_fact:
+    ufw_enable_check: "{{ {'rc': 0} if 'Status: active' in ufw_status_enabled.stdout else {'rc': 1} }}"
+- name: Configure system security settings
+  ansible.builtin.template:
+    src: sysctl-security.conf.j2
+    dest: /etc/sysctl.d/99-security.conf
+    mode: "0644"
+  notify: Reload sysctl
+- name: Disable root login if configured
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^#?PermitRootLogin.*
+    line: PermitRootLogin no
+  when: security_ssh_disable_root | bool
+  notify: Restart ssh
+- name: Disable password authentication if configured
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^#?PasswordAuthentication.*
+    line: PasswordAuthentication no
+  when: not security_ssh_password_auth
+  notify: Restart ssh
