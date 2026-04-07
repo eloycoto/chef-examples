@@ -1,0 +1,23 @@
+---
+- name: Install Redis package on Debian/Ubuntu
+  ansible.builtin.apt:
+    name: redis-server
+    state: present
+  when: ansible_os_family == "Debian"
+- name: Install Redis package on RedHat/CentOS
+  ansible.builtin.dnf:
+    name: redis
+    state: present
+  when: ansible_os_family == "RedHat"
+- name: Create Redis directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: redis
+    group: redis
+    mode: "0755"
+    recurse: true
+  loop:
+    - "{{ redis_dir }}"
+    - "{{ redis_log_dir }}"
+    - /var/run/redis

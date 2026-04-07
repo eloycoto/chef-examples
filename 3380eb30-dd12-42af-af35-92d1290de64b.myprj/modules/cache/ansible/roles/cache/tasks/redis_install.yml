@@ -1,0 +1,15 @@
+---
+- name: Include Redis prerequisites
+  ansible.builtin.include_tasks: redis_prereqs.yml
+- name: Install Redis package on Debian/Ubuntu
+  ansible.builtin.apt:
+    name: redis-server
+    state: present
+  when: ansible_os_family == "Debian"
+- name: Install Redis package on RedHat/CentOS
+  ansible.builtin.dnf:
+    name: redis
+    state: present
+  when: ansible_os_family == "RedHat"
+- name: Include Redis ulimit configuration
+  ansible.builtin.include_tasks: redis_ulimit.yml

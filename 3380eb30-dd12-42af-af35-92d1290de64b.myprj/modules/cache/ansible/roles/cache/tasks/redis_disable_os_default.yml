@@ -1,0 +1,23 @@
+---
+- name: Disable OS default Redis service on Debian/Ubuntu
+  ansible.builtin.service:
+    name: redis-server
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "Debian"
+  register: disable_debian_result
+  failed_when:
+    - disable_debian_result.failed is defined
+    - disable_debian_result.failed
+    - "'Could not find the requested service' not in disable_debian_result.msg"
+- name: Disable OS default Redis service on RedHat/CentOS
+  ansible.builtin.service:
+    name: redis
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "RedHat"
+  register: disable_redhat_result
+  failed_when:
+    - disable_redhat_result.failed is defined
+    - disable_redhat_result.failed
+    - "'Could not find the requested service' not in disable_redhat_result.msg"

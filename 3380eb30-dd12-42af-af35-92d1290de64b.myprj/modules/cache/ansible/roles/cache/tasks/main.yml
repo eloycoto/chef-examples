@@ -1,0 +1,44 @@
+---
+- name: Install memcached package
+  ansible.builtin.package:
+    name: memcached
+    state: present
+- name: Configure memcached
+  ansible.builtin.template:
+    src: memcached.conf.j2
+    dest: /etc/memcached.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart memcached
+- name: Ensure memcached service is enabled and running
+  ansible.builtin.service:
+    name: memcached
+    state: started
+    enabled: true
+- name: Create Redis log directory
+  ansible.builtin.file:
+    path: "{{ redis_log_dir }}"
+    state: directory
+    owner: redis
+    group: redis
+    mode: "0755"
+    recurse: true
+- name: Include Redis role from eloy.redis collection
+  ansible.builtin.include_role:
+    name: eloy.redis.redis
+  vars:
+    redis_port: "{{ redis_port }}"
+    redis_requirepass: "{{ redis_password }}"
+    redis_maxmemory: "{{ redis_maxmemory }}"
+    redis_dir: "{{ redis_dir }}"
+    redis_logfile: "{{ redis_logfile }}"
+    redis_rdb_enabled: "{{ redis_rdb_enabled }}"
+    redis_aof_enabled: "{{ redis_aof_enabled }}"
+- name: Fix Redis configuration
+  ansible.builtin.lineinfile:
+    path: /etc/redis/{{ redis_port }}.conf
+    regexp: ^{{ item }}.*$
+    state: absent
+  loop: "{{ redis_config_lines_to_remove }}"
+  notify: restart redis

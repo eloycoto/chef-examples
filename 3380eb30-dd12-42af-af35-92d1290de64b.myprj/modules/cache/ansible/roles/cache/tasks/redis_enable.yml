@@ -1,0 +1,13 @@
+---
+- name: Enable and start Redis service for systemd
+  ansible.builtin.service:
+    name: redis@{{ redis_port }}
+    state: started
+    enabled: true
+  when: ansible_service_mgr == "systemd"
+- name: Enable and start Redis service for non-systemd
+  ansible.builtin.service:
+    name: redis{{ redis_port }}
+    state: started
+    enabled: true
+  when: ansible_service_mgr != "systemd"

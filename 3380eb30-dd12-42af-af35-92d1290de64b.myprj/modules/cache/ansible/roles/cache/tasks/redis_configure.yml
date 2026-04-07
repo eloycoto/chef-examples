@@ -1,0 +1,5 @@
+---
+- name: Include Redis configure provider tasks
+  ansible.builtin.include_tasks: redis_configure_provider.yml
+- name: Disable OS default Redis service
+  ansible.builtin.include_tasks: redis_disable_os_default.yml
