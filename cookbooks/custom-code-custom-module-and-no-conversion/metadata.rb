@@ -1,4 +1,4 @@
-name             'nginx-multisite'
+name             'custom-code-custom-module-and-no-conversion'
 maintainer       'Chef Example'
 maintainer_email 'admin@example.com'
 license          'Apache-2.0'
